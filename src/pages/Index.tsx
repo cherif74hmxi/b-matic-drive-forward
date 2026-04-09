@@ -44,11 +44,11 @@ const Index = () => {
           <AnimatedSection>
             <div className="max-w-2xl">
               <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-                <span className="text-gradient-neon">Achat, réparation</span>
+                <span className="text-gradient-neon">Mecanique, entretien</span>
                 <br />
-                <span className="text-foreground">& dépannage</span>
+                <span className="text-foreground">& services</span>
                 <br />
-                <span className="text-foreground">de véhicules</span>
+                <span className="text-foreground">automobiles</span>
               </h1>
               <p className="text-muted-foreground text-lg md:text-xl mb-8 leading-relaxed max-w-lg">
                 B MATIC, votre garage automobile de confiance. Reprise de véhicules, entretien mécanique et dépannage 24h/24.
