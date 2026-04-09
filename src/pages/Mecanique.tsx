@@ -88,7 +88,7 @@ const Mecanique = () => {
 
         <AnimatedSection delay={100}>
           <div className="relative rounded-2xl overflow-hidden mb-12 max-w-4xl mx-auto border-glow">
-            <img src={mechanicBg} alt="Garage mécanique B MATIC" className="w-full h-48 md:h-72 object-cover" width={1200} height={800} loading="lazy" />
+            <img src={mechanicBg} alt="Garage mécanique B MATIC" className="w-full h-40 md:h-36 object-cover" width={1200} height={800} loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent flex items-end p-6 md:p-10">
               <div className="flex items-center gap-3">
                 <Clock className="w-8 h-8 text-neon-cyan" />
