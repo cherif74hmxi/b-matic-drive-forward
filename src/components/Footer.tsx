@@ -50,7 +50,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-neon-purple" />
-                <a href="mailto:contact@bmatic.fr" className="hover:text-foreground transition-colors">contact@bmatic.fr</a>
+                <a href="mailto:bmatic63s@gmail.com" className="hover:text-foreground transition-colors">bmatic63s@gmail.com</a>
               </li>
             </ul>
           </div>
