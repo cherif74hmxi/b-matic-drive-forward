@@ -11,6 +11,9 @@ const AnimatedSection = ({ children, className = "", delay = 0 }: AnimatedSectio
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -21,7 +24,7 @@ const AnimatedSection = ({ children, className = "", delay = 0 }: AnimatedSectio
       { threshold: 0.1 }
     );
 
-    if (ref.current) observer.observe(ref.current);
+    observer.observe(el);
     return () => observer.disconnect();
   }, [delay]);
 
