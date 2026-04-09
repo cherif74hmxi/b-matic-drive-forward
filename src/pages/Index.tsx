@@ -8,7 +8,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 const services = [
   {
     icon: Car,
-    title: "Achat",
+    title: "Rachat",
     desc: "Nous reprenons votre véhicule toutes marques à un prix juste et transparent. Estimation rapide et paiement immédiat.",
     btn: "Vendre mon véhicule",
     to: "/reprise",
