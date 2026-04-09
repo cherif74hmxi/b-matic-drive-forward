@@ -52,12 +52,6 @@ const Header = () => {
             <Phone className="w-4 h-4" />
             06 18 04 30 75
           </a>
-          <Link
-            to="/contact"
-            className="bg-gradient-btn text-primary-foreground font-heading text-xs uppercase tracking-wider px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
-          >
-            Devis gratuit
-          </Link>
         </div>
 
         <button
@@ -85,13 +79,6 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               06 18 04 30 75
             </a>
-            <Link
-              to="/contact"
-              onClick={() => setMenuOpen(false)}
-              className="bg-gradient-btn text-primary-foreground font-heading text-xs uppercase tracking-wider px-5 py-2.5 rounded-full text-center"
-            >
-              Devis gratuit
-            </Link>
           </nav>
         </div>
       )}
