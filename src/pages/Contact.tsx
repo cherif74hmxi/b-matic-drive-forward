@@ -63,7 +63,7 @@ const Contact = () => {
           <AnimatedSection delay={200}>
             <GlowCard>
               <h2 className="font-heading text-xl font-semibold mb-6 text-foreground">Envoyez-nous un message</h2>
-              <form onSubmit={handleSubmit} action="https://formspree.io/f/mlgokojb" className="space-y-4">
+              <form onSubmit={handleSubmit} action="https://formspree.io/f/mlgokojb" method="post" className="space-y-4">
                 <input
                   type="text"
                   placeholder="Nom complet"
