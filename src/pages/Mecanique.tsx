@@ -1,20 +1,22 @@
 import { useState, FormEvent } from "react";
-import { Clock } from "lucide-react";
+import { Clock, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AnimatedSection from "@/components/AnimatedSection";
 import GlowCard from "@/components/GlowCard";
 import NeonButton from "@/components/NeonButton";
 import mechanicBg from "@/assets/mechanic-bg.jpg";
+import { vehiculesData, marques } from "@/data/vehicules";
 
 const carburants = ["Essence", "Diesel", "Hybride", "Hybride Rechargeable", "Électrique", "Hydrogène", "GPL", "Gaz Naturel (GNV)", "Autre"];
 
-// Future planning data structure — ready for backend integration
-interface TimeSlot {
-  id: string;
-  date: string;
-  time: string;
-  available: boolean;
-  duration?: number; // in minutes
-}
+const heures = Array.from({ length: 16 }, (_, i) => {
+  const h = i + 7;
+  return `${h.toString().padStart(2, "0")}:00`;
+});
 
 const Mecanique = () => {
   const [step, setStep] = useState(1);
@@ -22,7 +24,11 @@ const Mecanique = () => {
   // Step 1
   const [marque, setMarque] = useState("");
   const [modele, setModele] = useState("");
+  const [autreMarqueModele, setAutreMarqueModele] = useState("");
   const [annee, setAnnee] = useState("");
+
+  const isAutre = marque === "Autre";
+  const modelesDisponibles = marque && !isAutre ? vehiculesData[marque] || [] : [];
   const [carburant, setCarburant] = useState("");
   const [boite, setBoite] = useState("");
   const [typeDemande, setTypeDemande] = useState("");
@@ -35,27 +41,55 @@ const Mecanique = () => {
   const [telephone, setTelephone] = useState("");
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
 
-  const step1Valid = marque && modele && annee && carburant && boite && typeDemande && description;
+  const step1Valid = (isAutre ? autreMarqueModele.trim().length > 0 : marque && modele) && annee && carburant && boite && typeDemande && description;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const phoneValid = /^\+\d{1,4}\s?\d+/.test(telephone);
   const step2Valid = nom && prenom && emailValid && phoneValid && consent;
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // Future: submit to backend / Formspree
-  };
+  const [formState, setFormState] = useState<{ status: string; message: string }>({ status: "idle", message: "" });
 
-  // Placeholder time slots — to be replaced with real backend data
-  const availableSlots: TimeSlot[] = [
-    { id: "1", date: "2026-04-14", time: "08:00", available: true },
-    { id: "2", date: "2026-04-14", time: "10:00", available: true },
-    { id: "3", date: "2026-04-14", time: "14:00", available: false },
-    { id: "4", date: "2026-04-15", time: "09:00", available: true },
-    { id: "5", date: "2026-04-15", time: "11:00", available: true },
-  ];
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setFormState({ status: "loading", message: "Envoi en cours..." });
+
+    const data = {
+      marque: isAutre ? "Autre" : marque,
+      modele: isAutre ? autreMarqueModele : modele,
+      annee,
+      motorisation,
+      carburant,
+      boite,
+      typeDemande,
+      description,
+      date: selectedDate ? format(selectedDate, "dd/MM/yyyy") : "",
+      heure: selectedTime,
+      nom,
+      prenom,
+      telephone,
+      email,
+    };
+
+    try {
+      const response = await fetch("https://formspree.io/f/xlgokywp", {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setFormState({ status: "success", message: "Merci ! Votre demande de rendez-vous a été envoyée avec succès." });
+        setTimeout(() => setFormState({ status: "idle", message: "" }), 6000);
+      } else {
+        throw new Error("Erreur serveur");
+      }
+    } catch {
+      setFormState({ status: "error", message: "Une erreur est survenue. Veuillez réessayer ou nous contacter directement." });
+      setTimeout(() => setFormState({ status: "idle", message: "" }), 6000);
+    }
+  };
 
   const inputClass = "w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm";
   const selectClass = `${inputClass} appearance-none`;
@@ -118,12 +152,25 @@ const Mecanique = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className={labelClass}>Marque *</label>
-                        <input type="text" className={inputClass} value={marque} onChange={(e) => setMarque(e.target.value)} required />
+                        <select className={selectClass} value={marque} onChange={(e) => { setMarque(e.target.value); setModele(""); setAutreMarqueModele(""); }} required>
+                          <option value="">Sélectionner une marque</option>
+                          {marques.map((m) => <option key={m} value={m}>{m}</option>)}
+                        </select>
                       </div>
-                      <div>
-                        <label className={labelClass}>Modèle *</label>
-                        <input type="text" className={inputClass} value={modele} onChange={(e) => setModele(e.target.value)} required />
-                      </div>
+                      {isAutre ? (
+                        <div>
+                          <label className={labelClass}>Précisez marque et modèle *</label>
+                          <textarea className={inputClass} rows={2} placeholder="Ex : Fiat 500, Seat Leon..." value={autreMarqueModele} onChange={(e) => setAutreMarqueModele(e.target.value)} required />
+                        </div>
+                      ) : (
+                        <div>
+                          <label className={labelClass}>Modèle *</label>
+                          <select className={selectClass} value={modele} onChange={(e) => setModele(e.target.value)} required disabled={!marque}>
+                            <option value="">Sélectionner un modèle</option>
+                            {modelesDisponibles.map((m) => <option key={m} value={m}>{m}</option>)}
+                          </select>
+                        </div>
+                      )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -182,29 +229,36 @@ const Mecanique = () => {
                       <span className="text-neon-purple">Étape 2 :</span> Coordonnées & créneau
                     </h3>
 
-                    {/* Planning placeholder — ready for backend */}
-                    <div className="border border-border rounded-xl p-4 bg-muted/30">
-                      <p className="text-sm font-medium text-foreground mb-3">Choisissez un créneau (bientôt disponible)</p>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {availableSlots.map((slot) => (
-                          <button
-                            key={slot.id}
-                            type="button"
-                            disabled={!slot.available}
-                            onClick={() => { setSelectedDate(slot.date); setSelectedTime(slot.time); }}
-                            className={`text-xs p-2 rounded-lg border transition-all ${
-                              selectedDate === slot.date && selectedTime === slot.time
-                                ? "border-primary bg-primary/20 text-foreground"
-                                : slot.available
-                                  ? "border-border text-muted-foreground hover:border-primary/50"
-                                  : "border-border/50 text-muted-foreground/50 cursor-not-allowed line-through"
-                            }`}
-                          >
-                            {slot.date.slice(5)} · {slot.time}
-                          </button>
-                        ))}
+                    {/* Date & heure */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className={labelClass}>Date souhaitée</label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button type="button" className={cn(inputClass, "flex items-center gap-2 text-left", !selectedDate && "text-muted-foreground")}>
+                              <CalendarIcon className="w-4 h-4 shrink-0" />
+                              {selectedDate ? format(selectedDate, "dd MMMM yyyy", { locale: fr }) : "Choisir une date"}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={selectedDate}
+                              onSelect={setSelectedDate}
+                              disabled={(date) => date < new Date()}
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">* Le système de réservation en ligne sera bientôt activé.</p>
+                      <div>
+                        <label className={labelClass}>Heure souhaitée</label>
+                        <select className={selectClass} value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)}>
+                          <option value="">Choisir une heure</option>
+                          {heures.map((h) => <option key={h} value={h}>{h}</option>)}
+                        </select>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -237,10 +291,15 @@ const Mecanique = () => {
                       <button type="button" onClick={() => setStep(1)} className="flex-1 border border-border text-foreground rounded-full py-3 text-sm font-heading uppercase tracking-wider hover:bg-muted transition-colors">
                         Retour
                       </button>
-                      <NeonButton type="submit" disabled={!step2Valid} className="flex-1">
-                        Envoyer ma demande
+                      <NeonButton type="submit" disabled={!step2Valid || formState.status === "loading"} className="flex-1">
+                        {formState.status === "loading" ? "Envoi en cours..." : "Envoyer ma demande"}
                       </NeonButton>
                     </div>
+                    {formState.message && (
+                      <div className={`mt-4 p-4 rounded-lg text-sm text-center font-medium ${formState.status === "success" ? "bg-green-500/20 text-green-400 border border-green-500/30" : formState.status === "error" ? "bg-destructive/20 text-destructive border border-destructive/30" : "bg-muted text-muted-foreground"}`}>
+                        {formState.message}
+                      </div>
+                    )}
                   </div>
                 )}
               </form>
