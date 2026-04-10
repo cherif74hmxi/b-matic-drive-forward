@@ -132,23 +132,25 @@ const Reprise = () => {
 
         {/* Carte grise info banner */}
         <AnimatedSection delay={100}>
-          <div className="relative mb-8 flex items-center px-6 py-4 md:px-8 md:py-5 rounded-lg border border-purple-500/20 bg-purple-950/30 backdrop-blur-sm overflow-visible">
-            <div className="absolute left-0 top-3 bottom-3 w-[2px] rounded-full bg-gradient-to-b from-purple-500/60 to-cyan-400/40" />
-            <div className="flex-1 pl-2 pr-[120px] md:pr-[170px]">
-              <p className="text-white/90 text-[15px] md:text-base leading-relaxed font-heading">
-                <span className="font-bold italic text-white">Nous vous</span>{" "}
-                conseillons de vous munir de votre{" "}
-                <strong className="text-purple-300 font-semibold">carte grise</strong>{" "}
-                afin de remplir ce formulaire.
-              </p>
-              <p className="text-white/50 text-xs md:text-sm leading-relaxed mt-1.5">
-                Cela vous évitera de chercher les informations à renseigner.
-              </p>
+          <div className="relative mb-8 max-w-[580px] mx-auto overflow-visible">
+            <div className="relative flex items-center px-6 py-4 md:px-8 md:py-5 rounded-lg border border-purple-500/20 bg-purple-950/30 backdrop-blur-sm">
+              <div className="absolute left-0 top-3 bottom-3 w-[2px] rounded-full bg-gradient-to-b from-purple-500/60 to-cyan-400/40" />
+              <div className="flex-1 pl-2 pr-4 -ml-3">
+                <p className="text-white/90 text-[15px] md:text-base leading-relaxed font-heading">
+                  <span className="font-bold italic text-white">Nous vous</span>{" "}
+                  conseillons de vous munir de votre{" "}
+                  <strong className="text-purple-300 font-semibold">carte grise</strong>{" "}
+                  afin de remplir ce formulaire.
+                </p>
+                <p className="text-white/50 text-xs md:text-sm leading-relaxed mt-1.5">
+                  Cela vous évitera de chercher les informations à renseigner.
+                </p>
+              </div>
             </div>
             <img
               src={carteGriseImg}
               alt="Carte grise"
-              className="hidden md:block absolute -top-10 right-4 w-[250px] rotate-[6deg] drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)] pointer-events-none z-10"
+              className="hidden md:block absolute -top-10 -right-[100px] w-[250px] rotate-[6deg] drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)] pointer-events-none z-10"
             />
           </div>
         </AnimatedSection>
